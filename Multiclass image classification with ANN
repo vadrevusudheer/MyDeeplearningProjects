@@ -1,0 +1,114 @@
+# Step 1: Installation and Setup
+
+# Installing TensorFlow
+! pip install -q tensorflow-gpu
+
+import tensorflow as tf
+
+print(tf.__version__)
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Step 2: Data Preprocessing
+
+# Importing the dataset
+from tensorflow.keras.datasets import fashion_mnist
+
+# Loading the dataset
+(x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
+
+x_train.shape, x_test.shape
+
+y_train.shape, y_test.shape
+
+np.max(x_train), np.min(x_train), np.mean(x_train)
+
+np.max(y_train), np.min(y_train)
+
+class_names = ['0 Top/T-shirt', '1 Trouser', '2 Pullover', '3 Dress', '4 Coat', '5 Sandal', '6 Shirt', '7 Sneaker', '8 Bag', '9 Ankle boot']
+print(class_names)
+
+# Data Exploration
+plt.figure()
+plt.imshow(x_train[1])
+plt.colorbar()
+
+y_train[1]
+
+# Normalizing the dataset
+x_train = x_train / 255.0
+x_test = x_test / 255.0
+
+plt.figure()
+plt.imshow(x_train[1])
+plt.colorbar()
+
+# Flattening the dataset
+x_train.shape, x_test.shape
+
+x_train = x_train.reshape(-1, 28*28)
+x_test = x_test.reshape(-1, 28*28)
+
+x_train.shape, x_test.shape
+
+# Step 3: Building the Model
+
+# Define an object
+model = tf.keras.models.Sequential()
+# sequence of layers
+
+# Adding first fully connected hidden layer
+# 1) units (No of neurons) = 128
+# 2) activation function = ReLU
+# 3) input shape = 784
+model.add(tf.keras.layers.Dense(units=128, activation='relu', input_shape=(784,)))
+
+# Adding the second layer with dropout
+model.add(tf.keras.layers.Dropout(0.3))
+# regularization technique, prevents overfitting
+
+# Adding the output layer
+# 1) units = 10
+# 2) activation = softmax
+model.add(tf.keras.layers.Dense(units=10, activation='softmax'))
+
+# Step 4: Training the model
+
+# Compiling the model
+# 1) Optimizer = adam, (minimize the loss function)
+# 2) loss function = sparse_categorical_crossentropy, (acts as guide to optimizer)
+# 3) metrices = sparse_categorical_accuracy
+
+model.compile(optimizer='adam',loss='sparse_categorical_crossentropy', metrics=['sparse_categorical_accuracy'])
+
+
+model.summary()
+
+# Training the model
+model.fit(x_train,y_train, epochs=10)
+
+# Step 5: Model evaluation and prediction
+
+# Model evaluation
+test_loss, test_accuracy = model.evaluate(x_test, y_test)
+
+print('Test Accuracy: {}'.format(test_accuracy))
+
+# Model prediction
+y_pred = model.predict_classes(x_test)
+
+print(y_pred)
+
+y_pred[110],  y_test[110] # predicted and actual output
+
+print(class_names)
+
+# Confusion metrix
+from sklearn.metrics import confusion_matrix, accuracy_score
+cm = confusion_matrix(y_test,y_pred)
+print(cm)
+
+acc_cm = accuracy_score(y_test, y_pred)
+print(acc_cm)
